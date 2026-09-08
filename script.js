@@ -1,5 +1,4 @@
 window.onload = init;
-console.ward = function () {}; // what warnings?
 
 function init() {
 	var root = new THREERoot({
@@ -9,7 +8,6 @@ function init() {
 	});
 
 	root.renderer.setClearColor(0x000000, 0);
-	root.renderer.setPixelRatio(window.devicePixelRatio || 1);
 	root.camera.position.set(0, 0, 60);
 
 	var width = 100;
@@ -37,10 +35,18 @@ function init() {
 	tl.add(slide.transition(), 0);
 	tl.add(slide2.transition(), 0);
 
-	createTweenScrubber(tl);
+	var prefersReducedMotion = window.matchMedia(
+		"(prefers-reduced-motion: reduce)"
+	).matches;
+
+	if (prefersReducedMotion) {
+		tl.progress(1).pause();
+	} else {
+		createTweenScrubber(tl);
+	}
 
 	window.addEventListener("keyup", function (e) {
-		if (e.keyCode === 80) {
+		if (e.key.toLowerCase() === "p" && !prefersReducedMotion) {
 			tl.paused(!tl.paused());
 		}
 	});
@@ -304,7 +310,7 @@ function THREERoot(params) {
 		params.fov,
 		window.innerWidth / window.innerHeight,
 		params.zNear,
-		params.zfar
+		params.zFar
 	);
 
 	this.scene = new THREE.Scene();
